@@ -73,7 +73,7 @@ const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
     user: "careerclassroom4@gmail.com",
-    pass: "ownvopmyqgzotsjn"
+    pass: "viqiqwwdppyjtntd"
   },
 });
 
@@ -194,8 +194,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: "careerclassroom4@gmail.com",
-      pass: "ownvopmyqgzotsjn" // generated ethereal password
+      user: "youthbuzz00@gmail.com",
+      pass: "viqiqwwdppyjtntd" // generated ethereal password
     },
   });
 
@@ -216,14 +216,14 @@ exports.signup = catchAsync(async (req, res, next) => {
         name: name, // Customize the recipient's name
         intro: `Your OTP for verification is:${otp}`,
         // code: otp, // Replace with your generated OTP
-        action: {
-          instructions: 'Please use this OTP to verify your account:',
-          button: {
-            color: '#007bff',
-            text: 'Verify Now',
-            link: 'https://yourapp.com/verify', // Link to the verification page
-          },
-        },
+        // action: {
+        //   instructions: 'Please use this OTP to verify your account:',
+        //   button: {
+        //     color: '#007bff',
+        //     text: 'Verify Now',
+        //     link: 'https://yourapp.com/verify', // Link to the verification page
+        //   },
+        // },
         outro: 'If you did not request this OTP, please ignore this email.',
       },
     };
@@ -233,7 +233,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   
     // Create email options
     const mailOptions = {
-      from: 'careerclassroom4@gmail.com',
+      from: 'youthbuzz00@gmail.com',
       to: email,
       subject: 'OTP Verification',
       html: emailBody,
@@ -313,8 +313,8 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: "careerclassroom4@gmail.com",
-      pass: "ownvopmyqgzotsjn" // generated ethereal password
+      user: "youthbuzz00@gmail.com",
+      pass: "viqiqwwdppyjtntd" // generated ethereal password
     },
   });
 
@@ -335,14 +335,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
         name: existingUser.name, // Customize the recipient's name
         intro: `Your OTP for verification is:${otp}`,
         // code: otp, // Replace with your generated OTP
-        action: {
-          instructions: 'Please use this OTP to verify your account:',
-          button: {
-            color: '#007bff',
-            text: 'Verify Now',
-            link: 'https://yourapp.com/verify', // Link to the verification page
-          },
-        },
+       
         outro: 'If you did not request this OTP, please ignore this email.',
       },
     };
@@ -491,13 +484,13 @@ exports.login = catchAsync(async (req, res, next) => {
       port: 587,
       secure: false,
       auth: {
-        user: "careerclassroom4@gmail.com",
-        pass: "ownvopmyqgzotsjn"
+        user: "youthbuzz00@gmail.com",
+        pass: "viqiqwwdppyjtntd"
       },
     });
 
     var mailOptions = {
-      from: "yashraj63951@gmail.com",
+      from: "youthbuzz00@gmail.com",
       to: email,
       subject: "OTP for login",
       text: "<h1>TEST DESH!!</h1>",
@@ -645,7 +638,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
         secure: true,
         auth: {
           user: "careerclassroom4@gmail.com",
-          pass: "ownvopmyqgzotsjn"
+          pass: "viqiqwwdppyjtntd"
         },
 
       });
