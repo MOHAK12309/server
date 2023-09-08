@@ -159,7 +159,7 @@ exports.getOneuser = catchAsync(async (req, res) => {
 
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber,email, password,lastname,gender, DOB,confirm_password } = req.body;
+  const { name, phoneNumber,email, password,lastname,gender, DOB,confirm_password,country } = req.body;
 
   if (!name || !email || !password || !lastname || !confirm_password) {
     return res.status(422).json({
@@ -202,7 +202,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const mailGenerator = new Mailgen({
     theme: 'salted', // Choose a Mailgen theme (e.g., 'salted' or 'neopolitan')
     product: {
-      name: 'Your App Name',
+      name: 'portal.youthbuzz.in',
       link: 'https://yourapp.com',
       // You can customize other product details here
     },
@@ -273,7 +273,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     OTP: OTP,
     gender:gender,
     DOB:DOB,
-    phoneNumber:phoneNumber
+    phoneNumber:phoneNumber,
+    country:country
   });
 
   const savedResponse = await newusers.save();
@@ -321,7 +322,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
   const mailGenerator = new Mailgen({
     theme: 'salted', // Choose a Mailgen theme (e.g., 'salted' or 'neopolitan')
     product: {
-      name: 'Your App Name',
+      name: 'portal.youthbuzz.in',
       link: 'https://yourapp.com',
       // You can customize other product details here
     },
@@ -450,8 +451,8 @@ exports.verify = async (req, res) => {
 
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { email, password,country } = req.body;
+  if (!email || !password,country) {
     return next(new AppError("please provide email and password", 400));
   }
   const user = await User.findOne({ email }).select("+password");
@@ -521,9 +522,9 @@ exports.login = catchAsync(async (req, res, next) => {
   //     })
 });
 exports.loginWithOtp = catchAsync(async (req, res, next) => {
-  const { email, OTP } = req.body;
+  const { email, OTP,country } = req.body;
 
-  if (!email || !OTP) {
+  if (!email || !OTP || !country) {
     return next(new AppError("Please provide email and OTP.", 400));
   }
 

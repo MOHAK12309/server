@@ -67,6 +67,9 @@ const user_schema = new mongoose.Schema({
     },
     gender:{
         type:String
+    },
+    country:{
+        type:String
     }
 });
 user_schema.pre("save", async function (next) {
