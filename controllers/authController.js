@@ -168,8 +168,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     });
   }
 
-  console.log(req.file)
-  req.body.photo = req.file.key
+ 
 
   const otp = otpGenerator.generate(4, {
     digits: true,
