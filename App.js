@@ -85,7 +85,7 @@ app.use('/api/v1/user', auth);
 // app.use("/linkedin",linkedinOathRouter)
 // app.use('/api/v1/upcoming', upcoming);
 
-
+app.use(cors())
 // Global Error Handler
 //  app.all('*', (req,res,next)=>{
 //      next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

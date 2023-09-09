@@ -35,9 +35,7 @@ const user_schema = new mongoose.Schema({
     },
 
 
-    photo: {
-        type: String,
-    },
+
     password: {
         type: String,
         // required: true,
@@ -70,7 +68,10 @@ const user_schema = new mongoose.Schema({
     },
     country:{
         type:String
-    }
+    },
+    photo: {
+        type : String
+            },
 });
 user_schema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
@@ -81,7 +82,13 @@ user_schema.pre("save", async function (next) {
 user_schema.methods.correctPassword = async function (
     candidatePassword,
     userPassword
-) {
+
+
+) 
+
+{
+    console.log('Candidate Password:', candidatePassword);
+    console.log('User Password:', userPassword);
     return await bcrypt.compare(candidatePassword, userPassword);
 };
 user_schema.methods.changePasswordAfter = function (JWTTimestamp) {
@@ -125,3 +132,4 @@ user_schema.methods.createPasswordResetToken = function () {
 // })}
 const user = mongoose.model("user", user_schema);
 module.exports = user;
+

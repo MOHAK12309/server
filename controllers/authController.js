@@ -159,7 +159,7 @@ exports.getOneuser = catchAsync(async (req, res) => {
 
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber,email, password,lastname,gender, DOB,confirm_password,country } = req.body;
+  const { name, phoneNumber,email, password,lastname,gender, DOB,confirm_password,country,photo } = req.body;
 
   if (!name || !email || !password || !lastname || !confirm_password) {
     return res.status(422).json({
@@ -168,18 +168,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     });
   }
 
-  const user = await User.findOne({ email: email });
-
-  if (user) {
-    return res.status(422).json({
-      status: true,
-      message: "email is already registered. please login",
-    });
-  }
-
-
-
-
+console.log(req.file)
+  req.body.photo = req.file.key
 
   const otp = otpGenerator.generate(4, {
     digits: true,
@@ -192,7 +182,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     service: "gmail",
     host: "smtp.gmail.com",
     port: 587,
-    secure: false, // true for 465, false for other ports
+    secure: true, // true for 465, false for other ports
     auth: {
       user: "youthbuzz00@gmail.com",
       pass: "viqiqwwdppyjtntd" // generated ethereal password
@@ -263,7 +253,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     expiresAt: time.toLocaleTimeString(),
   };
   
-
+  const dateOnly = DOB.split("T")[0];
   const newusers = new User({
     name: name,
     email: email,
@@ -272,12 +262,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     confirm_password: confirm_password,
     OTP: OTP,
     gender:gender,
-    DOB:DOB,
+    DOB:dateOnly,
     phoneNumber:phoneNumber,
-    country:country
+    country:country,
+    photo:req.file.key
   });
-
-  const savedResponse = await newusers.save();
+console.log(dateOnly)
+const savedResponse = await newusers.save();
 
   createAndSendToken(savedResponse, 201, res);
 });
@@ -451,8 +442,8 @@ exports.verify = async (req, res) => {
 
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password,country } = req.body;
-  if (!email || !password,country) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return next(new AppError("please provide email and password", 400));
   }
   const user = await User.findOne({ email }).select("+password");
@@ -522,9 +513,9 @@ exports.login = catchAsync(async (req, res, next) => {
   //     })
 });
 exports.loginWithOtp = catchAsync(async (req, res, next) => {
-  const { email, OTP,country } = req.body;
+  const { email, OTP } = req.body;
 
-  if (!email || !OTP || !country) {
+  if (!email || !OTP ) {
     return next(new AppError("Please provide email and OTP.", 400));
   }
 
@@ -715,7 +706,7 @@ exports.reset = catchAsync(async (req, res, next) => {
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from collection
-  const user = await User.findOne(req.body.email).select("+password");
+  const user = await User.findById(req.params.id).select("+password");
 
   // 2) Check if POSTed current password is correct
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
@@ -724,7 +715,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   // 3) If so, update password
   user.password = req.body.password;
-  user.confirm_password = req.body.confirm_password;
+ 
   await user.save();
 
   // User.findByIdAndUpdate will NOT work as intended!
@@ -739,7 +730,19 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   //   })
 
-  createAndSendToken(user, 200, res);
+  createAndSendToken(user, 201, res);
+});
+
+exports.deleteuser = catchAsync(async (req, res, next) => {
+  const seller = await User.findByIdAndDelete(req.params.id);
+
+  if (!seller) {
+      return next(new AppError(`No ${seller} found with that ID`, 404));
+  }
+  res.status(204).json({
+      status: 'success',
+      data: null
+  });
 });
 
 // Generate OTP and send email
