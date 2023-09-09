@@ -4,7 +4,7 @@ const auth = require('./../controllers/authController');
 
 const { upload } = require("../utils/s3")
 
-router.post('/signup',upload("youthbuzzdata", "userData/","user").single('photo'), auth.signup)
+router.post('/signup', auth.signup)
 router.post('/login', auth.login)
 router.post('/loginWithOtp', auth.loginWithOtp)
 router.patch('/update/:id', auth.updateUser)

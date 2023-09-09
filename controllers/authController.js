@@ -16,11 +16,11 @@ const otpGenerator = require("otp-generator");
 const { upload } = require("../utils/s3")
 
 const { result, slice } = require("lodash");
-const   Mailgen =require("mailgen")
+const Mailgen = require("mailgen")
 exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
 
 
-  const uploadSingle = upload("youthbuzzdata", "userData/","user").single('photo');
+  const uploadSingle = upload("youthbuzzdata", "userData/", "user").single('photo');
   uploadSingle(req, res, async (err) => {
     if (err) {
       return next(new AppError(err.message, 400));
@@ -159,7 +159,7 @@ exports.getOneuser = catchAsync(async (req, res) => {
 
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber,email, password,lastname,gender, DOB,confirm_password,country,photo } = req.body;
+  const { name, phoneNumber, email, password, lastname, gender, DOB, confirm_password, country} = req.body;
 
   if (!name || !email || !password || !lastname || !confirm_password) {
     return res.status(422).json({
@@ -168,7 +168,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     });
   }
 
-console.log(req.file)
+  console.log(req.file)
   req.body.photo = req.file.key
 
   const otp = otpGenerator.generate(4, {
@@ -197,7 +197,7 @@ console.log(req.file)
       // You can customize other product details here
     },
   });
-  
+
   // Function to send OTP via email
   const sendOTPEmail = () => {
     // Create a Mailgen email template
@@ -217,10 +217,10 @@ console.log(req.file)
         outro: 'If you did not request this OTP, please ignore this email.',
       },
     };
-  
+
     // Generate the email HTML using Mailgen
     const emailBody = mailGenerator.generate(email2);
-  
+
     // Create email options
     const mailOptions = {
       from: 'youthbuzz00@gmail.com',
@@ -228,7 +228,7 @@ console.log(req.file)
       subject: 'OTP Verification',
       html: emailBody,
     };
-  
+
     // Send the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -238,9 +238,9 @@ console.log(req.file)
       }
     });
   };
-  
+
   // Usage example:
-   // Replace with the recipient's email
+  // Replace with the recipient's email
   // Replace with your generated OTP
   sendOTPEmail();
 
@@ -252,23 +252,23 @@ console.log(req.file)
     createdAt: new Date().toLocaleTimeString(),
     expiresAt: time.toLocaleTimeString(),
   };
-  
+
   const dateOnly = DOB.split("T")[0];
   const newusers = new User({
     name: name,
     email: email,
-    lastname:lastname,
+    lastname: lastname,
     password: password,
     confirm_password: confirm_password,
     OTP: OTP,
-    gender:gender,
-    DOB:dateOnly,
-    phoneNumber:phoneNumber,
-    country:country,
-    photo:req.file.key
+    gender: gender,
+    DOB: dateOnly,
+    phoneNumber: phoneNumber,
+    country: country
+   
   });
-console.log(dateOnly)
-const savedResponse = await newusers.save();
+  console.log(dateOnly)
+  const savedResponse = await newusers.save();
 
   createAndSendToken(savedResponse, 201, res);
 });
@@ -318,7 +318,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
       // You can customize other product details here
     },
   });
-  
+
   // Function to send OTP via email
   const sendOTPEmail = () => {
     // Create a Mailgen email template
@@ -327,14 +327,14 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
         name: existingUser.name, // Customize the recipient's name
         intro: `Your OTP for verification is:${otp}`,
         // code: otp, // Replace with your generated OTP
-       
+
         outro: 'If you did not request this OTP, please ignore this email.',
       },
     };
-  
+
     // Generate the email HTML using Mailgen
     const emailBody = mailGenerator.generate(email2);
-  
+
     // Create email options
     const mailOptions = {
       from: 'careerclassroom4@gmail.com',
@@ -342,7 +342,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
       subject: 'OTP Verification',
       html: emailBody,
     };
-  
+
     // Send the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -352,9 +352,9 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
       }
     });
   };
-  
+
   // Usage example:
-   // Replace with the recipient's email
+  // Replace with the recipient's email
   // Replace with your generated OTP
   sendOTPEmail();
   // const emailSent = await sendOTPByEmail(email, otp);
@@ -399,12 +399,12 @@ exports.verify = async (req, res) => {
     if (currentTime > expiresAt) {
       res.status(400).send('OTP has expired');
     } else {
-      await User.findOneAndUpdate({ 'OTP.OTP': OTP }, { $unset: { OTP: 1 },verified:true });
+      await User.findOneAndUpdate({ 'OTP.OTP': OTP }, { $unset: { OTP: 1 }, verified: true });
 
       res.status(201).json({
-         statusbar:"true"
+        statusbar: "true"
       })
-  
+
     }
   }
 };
@@ -461,14 +461,14 @@ exports.login = catchAsync(async (req, res, next) => {
     });
 
     // Update user's OTP and expiry in the database
-   user.OTP = {
+    user.OTP = {
       OTP: newOTP,
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + 5 * 60 * 1000), // Set expiry for 5 minutes from now
     };
- 
+
     await user.save()
- 
+
 
     let transporter = nodemailer.createTransport({
       service: "gmail",
@@ -515,7 +515,7 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.loginWithOtp = catchAsync(async (req, res, next) => {
   const { email, OTP } = req.body;
 
-  if (!email || !OTP ) {
+  if (!email || !OTP) {
     return next(new AppError("Please provide email and OTP.", 400));
   }
 
@@ -531,12 +531,12 @@ exports.loginWithOtp = catchAsync(async (req, res, next) => {
     if (currentTime > expiresAt) {
       res.status(400).send('OTP has expired');
     } else {
-      await User.findOneAndUpdate({ 'OTP.OTP': OTP }, { $unset: { OTP: 1 },verified:true });
+      await User.findOneAndUpdate({ 'OTP.OTP': OTP }, { $unset: { OTP: 1 }, verified: true });
 
       res.status(201).json({
-         statusbar:"true"
+        statusbar: "true"
       })
-  
+
     }
   }
 });
@@ -715,7 +715,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   // 3) If so, update password
   user.password = req.body.password;
- 
+
   await user.save();
 
   // User.findByIdAndUpdate will NOT work as intended!
@@ -737,11 +737,11 @@ exports.deleteuser = catchAsync(async (req, res, next) => {
   const seller = await User.findByIdAndDelete(req.params.id);
 
   if (!seller) {
-      return next(new AppError(`No ${seller} found with that ID`, 404));
+    return next(new AppError(`No ${seller} found with that ID`, 404));
   }
   res.status(204).json({
-      status: 'success',
-      data: null
+    status: 'success',
+    data: null
   });
 });
 
