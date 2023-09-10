@@ -587,71 +587,69 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError("There is no user with email address.", 404));
+    return next(new AppError("There is no user with the provided email address.", 404));
   }
 
   // 2) Generate the random reset token
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  // 3) Send it to user's email
+  // 3) Send it to the user's email
   const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/reset/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
-  const emailContent = `
-  <html>
-  <body>
-    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td align="center">
-          <table width="100%" border="0" cellspacing="0" cellpadding="0">
-            <tr>
-              <td style="padding: 20px;background-color:blue; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5;">
-                <p>Click on the below link to reset your password</p>
-                <a style="color:white;"  href="https://www.careerclassroom.in/reset/${resetToken}">Reset Your Password</a>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
-`
-
   try {
-    const sendEmail = async (email, subject, message) => {
-      // 1) Create a transporter
-      const transporter = nodemailer.createTransport({
-        service: "Gmail",
-        host: 'smtp.gmail.com',          // Your SMTP server hostname
-        port: 465,                          // Port for secure SMTP (e.g., 465 for SSL, 587 for TLS)
-        secure: true,
-        auth: {
-          user: "careerclassroom4@gmail.com",
-          pass: "viqiqwwdppyjtntd"
-        },
-
-      });
-      // 2) Define the email options
-      const mailOptions = {
-        from: '<careerclassroom4@gmail.com>',
-        to: user.email,
-        subject: 'Forgot your password',
-        text: `Your OTP: `,
-        html: emailContent
-
-      };
-
-      //    // 3) Actually send the email
-      await transporter.sendMail(mailOptions);
-
-    };
-    await sendEmail({
-      email: user.email,
-      subject: "Your password reset token (valid for 10 min)",
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // Use false for port 587
+      auth: {
+        user: "youthbuzz00@gmail.com",
+        pass: "viqiqwwdppyjtntd", // Use your Gmail password
+      },
     });
 
+    const mailGenerator = new Mailgen({
+      theme: 'salted',
+      product: {
+        name: 'portal.youthbuzz.in',
+        link: 'https://yourapp.com',
+      },
+    });
+
+    // Create a Mailgen email template
+    const email = {
+      body: {
+        name: user.name, // Customize the recipient's name
+        intro: "Forgot your password?",
+        action: {
+          instructions: "Please reset your password by clicking the button below:",
+          button: {
+            color: "#007bff",
+            text: "Reset Your Password",
+            link: `https://portal.youthbuzz.in/reset/${resetToken}` 
+          },
+        },
+        outro: "If you didn't forget your password, please ignore this email.",
+      },
+    };
+
+    // Generate the email HTML using Mailgen
+    const emailBody = mailGenerator.generate(email);
+
+    // Create email options
+    const mailOptions = {
+      from: 'youthbuzz00@gmail.com',
+      to: user.email,
+      subject: 'Password Reset',
+      html: emailBody,
+    };
+
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Password reset email sent:', info.response);
+
+    // Send a response to the client
     res.status(200).json({
       status: "success",
       message: "Token sent to email!",
@@ -662,11 +660,13 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     return next(
-      new AppError("There was an error sending the email. Try again later!"), 500
+      new AppError("There was an error sending the email. Try again later!"),
+      500
     );
   }
-  createAndSendToken(user, 200, res);
 });
+
+
 exports.reset = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
 
