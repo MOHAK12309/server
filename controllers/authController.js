@@ -532,9 +532,7 @@ exports.loginWithOtp = catchAsync(async (req, res, next) => {
     } else {
       await User.findOneAndUpdate({ 'OTP.OTP': OTP }, { $unset: { OTP: 1 }, verified: true });
 
-      res.status(201).json({
-        statusbar: "true"
-      })
+  createAndSendToken(user,201,res)
 
     }
   }
