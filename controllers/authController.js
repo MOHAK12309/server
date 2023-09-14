@@ -18,28 +18,29 @@ const { upload } = require("../utils/s3")
 const { result, slice } = require("lodash");
 const Mailgen = require("mailgen")
 const admin = require('firebase-admin');
+const verify=require("../models/verify")
 
 
 
-admin.initializeApp({
-  credential: admin.credential.cert({
+// admin.initializeApp({
+//   credential: admin.credential.cert({
     
-      "type": "service_account",
-      "project_id": "youthbuzzwebtest",
-      "private_key_id": "78cabc1a5575243ba47cabc19eab8333f25fbadb",
-      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDnctYhJHJJ8xNc\nDSNwp4RpF1XnSVXC2c1XgcL8a5qy50JEOH9vT9Mgobv6u/JE5a8PlS82SBTZ9aBu\nmafeeHFB20GeRn/P4dVJlnA+03dsUU6F5ZdKGAkEPgeQUnvq5mHWMTg/2S19iPza\nmxAl1jG3ODPPFeowMWbgwKZUlaT+dm32E+xQtjNyIFmm3yNNWnZWbUbgEV7m+jod\nXd/KkKvbS6KFFk/LXdcpJ/kKqKwU/4Msc9gdMh09eipVRw2G8MNr0m4PYOGj6J+K\neVZ+E/IKdlVhk2k2u2EQpwiLk2ILLG+KotM2H6t8kNNVUbMWCe4dCOMTOrq3AHfi\nAQtLgVNxAgMBAAECggEAFhcIxusCmXpAu8VpP4RNh/Y5NbTzIYDGL3bsFEl032Rh\nF7/IsegNf4zQMzMjAV5mofccJXMlwlPGNyglNH+MV7vEfIXAByhHwhlAp05plIYC\nF5d9JA49NhFxiV3GA/pvFhFmi/l/dP7RG1A3b1UNM66Ci15NFsJwTj004tfRgpO+\nj7jD9oMgAK2mtdSImjZtSX5zXGHzBeCJjVM9IY41FkU0ajEyYtj2jklFhTf3RZuk\nqlsWIY8sCf/5dfG4weOiAmJBC0pCRHtb9GFnZ4YNiHjgFUXZGO74B9wuwqOIsMjb\nbzqqG6xpmOBzX0QLmSIVv9RoPdQwpXd2lX8oUdXLHQKBgQD/oypXIE5SP9MswZhJ\nKECUZyKEHNpHIqEym47jfiAQ+R2ckDf173Yx5mdM/S52305GxgsI+MNBBiy0MW2G\nbqieaGnJwBoW0fMzwg3Vv/VEaS1CqiTZH8qY6AMMykQJ3xBPJF4T96EEDyVPizh1\nxdA8FgKeZ25keRo6A+4kk5tyJwKBgQDnxuMMHMHRFEZoDoV+em7osOOB29c5f4av\nw8A7qZOST2cWuG9VJoq5YwKnnMjkEYQfdunKvJaTezNKRPPQsq80HWMEbO+3mE60\n2URtGby8q3WpPa0VpOocuLIebYURhNFX7yqKMEWMpi8jDIwgvSVRhkLL94lxOhay\njX+nCSzEpwKBgQCo2wUHoc46I/CAOqw1foIRxIIXE9vWavhhLkFW4SObMoGtvdFJ\nANBoq5EGWKINYPkaZIw7c929IK/8oj1/M67rW3qtCdfxxOJJCOAMlYwTkQmVZD+M\nr6QqFe6VzzDb+FyUeiguNj5EKSDzBrnXiT8/wSYfraBMe3WoZpoxzNI7twKBgQCR\nnJTF5kcpqHg3JXBermKBU6gKzGehmumuAOgDU5z/nVzhnEttjoI2x+pCDTD0f8Cm\n19k3YlWjIBJwBXO72JZTwmaTwDC2AjzoR1tCw5mcWofYJIRaBbqDAtH8Zcfk4rF2\nci4ilQMMwtb4SQi8BLiuSBAs/j3d4aWi1VyuPwheHwKBgQCjAiLjiCQ2mCchoLvw\nzM+H81Mm2KMjp/ZTvBV6DS/g2odLCX1GqENrCGLKFw5VejweMNUKLwt4k0TbWJr9\nWVbBIkYfGa5KHLgZxOuTSc+o8h5jmzClE02le93ZVFXr7HDJ5cm+t9s/jsWgHrbi\nvVsevWooAZCtWfKUaCuW6tdxuQ==\n-----END PRIVATE KEY-----\n",
-      "client_email": "firebase-adminsdk-a744y@youthbuzzwebtest.iam.gserviceaccount.com",
-      "client_id": "107654070045600469214",
-      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-      "token_uri": "https://oauth2.googleapis.com/token",
-      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-a744y%40youthbuzzwebtest.iam.gserviceaccount.com",
-      "universe_domain": "googleapis.com"
-    }
+//       "type": "service_account",
+//       "project_id": "youthbuzzwebtest",
+//       "private_key_id": "78cabc1a5575243ba47cabc19eab8333f25fbadb",
+//       "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDnctYhJHJJ8xNc\nDSNwp4RpF1XnSVXC2c1XgcL8a5qy50JEOH9vT9Mgobv6u/JE5a8PlS82SBTZ9aBu\nmafeeHFB20GeRn/P4dVJlnA+03dsUU6F5ZdKGAkEPgeQUnvq5mHWMTg/2S19iPza\nmxAl1jG3ODPPFeowMWbgwKZUlaT+dm32E+xQtjNyIFmm3yNNWnZWbUbgEV7m+jod\nXd/KkKvbS6KFFk/LXdcpJ/kKqKwU/4Msc9gdMh09eipVRw2G8MNr0m4PYOGj6J+K\neVZ+E/IKdlVhk2k2u2EQpwiLk2ILLG+KotM2H6t8kNNVUbMWCe4dCOMTOrq3AHfi\nAQtLgVNxAgMBAAECggEAFhcIxusCmXpAu8VpP4RNh/Y5NbTzIYDGL3bsFEl032Rh\nF7/IsegNf4zQMzMjAV5mofccJXMlwlPGNyglNH+MV7vEfIXAByhHwhlAp05plIYC\nF5d9JA49NhFxiV3GA/pvFhFmi/l/dP7RG1A3b1UNM66Ci15NFsJwTj004tfRgpO+\nj7jD9oMgAK2mtdSImjZtSX5zXGHzBeCJjVM9IY41FkU0ajEyYtj2jklFhTf3RZuk\nqlsWIY8sCf/5dfG4weOiAmJBC0pCRHtb9GFnZ4YNiHjgFUXZGO74B9wuwqOIsMjb\nbzqqG6xpmOBzX0QLmSIVv9RoPdQwpXd2lX8oUdXLHQKBgQD/oypXIE5SP9MswZhJ\nKECUZyKEHNpHIqEym47jfiAQ+R2ckDf173Yx5mdM/S52305GxgsI+MNBBiy0MW2G\nbqieaGnJwBoW0fMzwg3Vv/VEaS1CqiTZH8qY6AMMykQJ3xBPJF4T96EEDyVPizh1\nxdA8FgKeZ25keRo6A+4kk5tyJwKBgQDnxuMMHMHRFEZoDoV+em7osOOB29c5f4av\nw8A7qZOST2cWuG9VJoq5YwKnnMjkEYQfdunKvJaTezNKRPPQsq80HWMEbO+3mE60\n2URtGby8q3WpPa0VpOocuLIebYURhNFX7yqKMEWMpi8jDIwgvSVRhkLL94lxOhay\njX+nCSzEpwKBgQCo2wUHoc46I/CAOqw1foIRxIIXE9vWavhhLkFW4SObMoGtvdFJ\nANBoq5EGWKINYPkaZIw7c929IK/8oj1/M67rW3qtCdfxxOJJCOAMlYwTkQmVZD+M\nr6QqFe6VzzDb+FyUeiguNj5EKSDzBrnXiT8/wSYfraBMe3WoZpoxzNI7twKBgQCR\nnJTF5kcpqHg3JXBermKBU6gKzGehmumuAOgDU5z/nVzhnEttjoI2x+pCDTD0f8Cm\n19k3YlWjIBJwBXO72JZTwmaTwDC2AjzoR1tCw5mcWofYJIRaBbqDAtH8Zcfk4rF2\nci4ilQMMwtb4SQi8BLiuSBAs/j3d4aWi1VyuPwheHwKBgQCjAiLjiCQ2mCchoLvw\nzM+H81Mm2KMjp/ZTvBV6DS/g2odLCX1GqENrCGLKFw5VejweMNUKLwt4k0TbWJr9\nWVbBIkYfGa5KHLgZxOuTSc+o8h5jmzClE02le93ZVFXr7HDJ5cm+t9s/jsWgHrbi\nvVsevWooAZCtWfKUaCuW6tdxuQ==\n-----END PRIVATE KEY-----\n",
+//       "client_email": "firebase-adminsdk-a744y@youthbuzzwebtest.iam.gserviceaccount.com",
+//       "client_id": "107654070045600469214",
+//       "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+//       "token_uri": "https://oauth2.googleapis.com/token",
+//       "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+//       "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-a744y%40youthbuzzwebtest.iam.gserviceaccount.com",
+//       "universe_domain": "googleapis.com"
+//     }
     
   
-  ),
-});
+//   ),
+// });
 
 
 // const firebaseConfig = {
@@ -196,145 +197,135 @@ exports.getOneuser = catchAsync(async (req, res) => {
 
 
 
-exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password,lastname, confirm_password,country,phoneNumber,gender,DOB } = req.body;
+// exports.signup = catchAsync(async (req, res, next) => {
+//   const {  email } = req.body;
 
-  if (!name || !email || !password || !lastname || !confirm_password) {
-    return res.status(422).json({
-      status: false,
-      message: "please provide required requested field",
-    });
-  }
+//   if ( !email ) {
+//     return res.status(422).json({
+//       status: false,
+//       message: "please provide required requested field",
+//     });
+//   }
 
-  const user = await User.findOne({ email: email });
+//   const user = await verify.findOne({ email: email });
 
-  if (user) {
-    return res.status(422).json({
-      status: true,
-      message: "email is already registered. please login",
-    });
-  }
-
-
+//   if (user) {
+//     return res.status(422).json({
+//       status: true,
+//       message: "email is already registered. please login",
+//     });
+//   }
 
 
 
 
 
-  const otp = otpGenerator.generate(4, {
-    digits: true,
-    lowerCaseAlphabets: false,
-    upperCaseAlphabets: false,
-    specialChars: false,
-  });
-  let transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: true, // true for 465, false for other ports
-    auth: {
-      user: "youthbuzz00@gmail.com",
-      pass: "viqiqwwdppyjtntd" // generated ethereal password
-    },
-  });
 
-  const mailGenerator = new Mailgen({
-    theme: 'salted', // Choose a Mailgen theme (e.g., 'salted' or 'neopolitan')
-    product: {
-      name: 'portal.youthbuzz.in',
-      link: 'https://yourapp.com',
-      // You can customize other product details here
-    },
-  });
 
-  // Function to send OTP via email
-  const sendOTPEmail = () => {
-    // Create a Mailgen email template
-    const email2 = {
-      body: {
-        name: name, // Customize the recipient's name
-        intro: `Your OTP for verification is:${otp}`,
-        // code: otp, // Replace with your generated OTP
+//   const otp = otpGenerator.generate(4, {
+//     digits: true,
+//     lowerCaseAlphabets: false,
+//     upperCaseAlphabets: false,
+//     specialChars: false,
+//   });
+//   let transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     host: "smtp.gmail.com",
+//     port: 587,
+//     secure: true, // true for 465, false for other ports
+//     auth: {
+//       user: "youthbuzz00@gmail.com",
+//       pass: "viqiqwwdppyjtntd" // generated ethereal password
+//     },
+//   });
 
-        outro: 'If you did not request this OTP, please ignore this email.',
-      },
-    };
+//   const mailGenerator = new Mailgen({
+//     theme: 'salted', // Choose a Mailgen theme (e.g., 'salted' or 'neopolitan')
+//     product: {
+//       name: 'portal.youthbuzz.in',
+//       link: 'https://yourapp.com',
+//       // You can customize other product details here
+//     },
+//   });
 
-    // Generate the email HTML using Mailgen
-    const emailBody = mailGenerator.generate(email2);
+//   // Function to send OTP via email
+//   const sendOTPEmail = () => {
+//     // Create a Mailgen email template
+//     const email2 = {
+//       body: {
+//          // Customize the recipient's name
+//         intro: `Your OTP for verification is:${otp}`,
+//         // code: otp, // Replace with your generated OTP
 
-    // Create email options
-    const mailOptions = {
-      from: 'youthbuzz00@gmail.com',
-      to: email,
-      subject: 'OTP Verification',
-      html: emailBody,
-    };
+//         outro: 'If you did not request this OTP, please ignore this email.',
+//       },
+//     };
 
-    // Send the email
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending OTP email:', error);
-      } else {
-        console.log('OTP email sent:', info.response);
-      }
-    });
-  };
+//     // Generate the email HTML using Mailgen
+//     const emailBody = mailGenerator.generate(email2);
 
-  sendOTPEmail()
+//     // Create email options
+//     const mailOptions = {
+//       from: 'youthbuzz00@gmail.com',
+//       to: email,
+//       subject: 'OTP Verification',
+//       html: emailBody,
+//     };
 
-  const time = new Date();
-  time.setMinutes(time.getMinutes() + 5);
+//     // Send the email
+//     transporter.sendMail(mailOptions, (error, info) => {
+//       if (error) {
+//         console.error('Error sending OTP email:', error);
+//       } else {
+//         console.log('OTP email sent:', info.response);
+//       }
+//     });
+//   };
 
-  const OTP = {
-    OTP: otp,
-    createdAt: new Date().toLocaleTimeString(),
-    expiresAt: time.toLocaleTimeString(),
-  };
+//   sendOTPEmail()
+
+//   const time = new Date();
+//   time.setMinutes(time.getMinutes() + 5);
+
+//   const OTP = {
+//     OTP: otp,
+//     createdAt: new Date().toLocaleTimeString(),
+//     expiresAt: time.toLocaleTimeString(),
+//   };
   
 
-  const newusers = new User({
-    name: name,
-    email: email,
-    lastname:lastname,
-    password: password,
-    confirm_password: confirm_password,
-    OTP: OTP,
-    country:country,
-    phoneNumber:phoneNumber,
-    gender:gender,
-    DOB:DOB
-    });
+//   const newusers = new User({
+    
+//     email: email,
+  
+//     OTP: OTP,
+    
+//     });
 
-  const savedResponse = await newusers.save();
+//   const savedResponse = await newusers.save();
 
-  createAndSendToken(savedResponse, 201, res);
+//   createAndSendToken(savedResponse, 201, res);
+// });
+exports.signup2 =catchAsync(async (req, res) => {
+  const newUser = await User.create({
+    email: req.body.email,
+    name: req.body.name,
+    password: req.body.password,
+    confirm_password: req.body.confirm_password,
+    gender: req.body.gender,
+    DOB:req.body.DOB,
+    phoneNumber:req.body.phoneNumber,
+    country:req.body.country
+
+     
+    
+  });
+  // const url = `${req.protocol}://${req.get('host')}/all-services`;
+  // await new sendEmail(newUser, url).sendWelcome();
+    console.log(newUser);
+  createAndSendToken(newUser, 201,  res)
 });
-exports.verify = async (req, res) => {
-  const { OTP } = req.body;
 
-  // Assuming 'User' is your model name
-  const user = await User.findOne({ 'OTP.OTP': OTP });
-
-  if (!user) {
-    res.status(400).send('Invalid OTP');
-
-  } else {
-    const currentTime = new Date().getTime();
-    const expiresAt = new Date(user.OTP.expiresAt).getTime();
-
-    if (currentTime > expiresAt) {
-      res.status(400).send('OTP has expired');
-    } else {
-      await User.findOneAndUpdate({ 'OTP.OTP': OTP }, { $unset: { OTP: 1 },verified:true });
-
-      res.status(201).json({
-         statusbar:"true"
-      })
-  
-    }
-  }
-};
 
 
 
@@ -515,60 +506,6 @@ exports.login = catchAsync(async (req, res, next) => {
   }
   const user = await User.findOne({ email }).select("+password");
 
-  if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError("incorrect pass and mail"), 401);
-  }
-  if (!user.verified) {
-    // Generate a new OTP for login
-    const newOTP = otpGenerator.generate(4, {
-      digits: true,
-      lowerCaseAlphabets: false,
-      upperCaseAlphabets: false,
-      specialChars: false,
-    });
-
-    // Update user's OTP and expiry in the database
-    user.OTP = {
-      OTP: newOTP,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // Set expiry for 5 minutes from now
-    };
-
-    await user.save()
-
-
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: "youthbuzz00@gmail.com",
-        pass: "viqiqwwdppyjtntd"
-      },
-    });
-
-    var mailOptions = {
-      from: "youthbuzz00@gmail.com",
-      to: email,
-      subject: "OTP for login",
-      text: "<h1>TEST DESH!!</h1>",
-      html: `<h1>Your new one-time OTP is ${newOTP}</h2>`,
-    };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
-      }
-    });
-
-    return res.status(200).json({
-      status: "false",
-      message: "Account is not verified. New OTP has been sent to your email.",
-    });
-  }
 
   createAndSendToken(user, 200, res);
   //     const token=jwt.sign({id:user._id},'this-is-my-super-longer-secret',{

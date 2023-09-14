@@ -19,7 +19,7 @@ const user_schema = new mongoose.Schema({
     email: {
         type: String,
 
-        unique: true,
+        // unique: true,
         lowercase: true,
     },
     country: {
@@ -95,7 +95,7 @@ user_schema.methods.changePasswordAfter = function (JWTTimestamp) {
     if (this.Passwordchanged) {
         const changedTimestamp = parseInt(
             this.Passwordchanged.getTime() / 1000,
-            10
+            
         );
         console.log(this.Passwordchanged, JWTTimestamp);
         return JWTTimestamp < changedTimestamp;
