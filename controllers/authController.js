@@ -197,14 +197,29 @@ exports.getOneuser = catchAsync(async (req, res) => {
 
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber, email, password, lastname, gender, DOB, confirm_password, country } = req.body;
+  const { name, email, password,lastname, confirm_password,country,phoneNumber,gender,DOB } = req.body;
 
   if (!name || !email || !password || !lastname || !confirm_password) {
     return res.status(422).json({
       status: false,
-      message: 'Please provide required requested field',
+      message: "please provide required requested field",
     });
   }
+
+  const user = await User.findOne({ email: email });
+
+  if (user) {
+    return res.status(422).json({
+      status: true,
+      message: "email is already registered. please login",
+    });
+  }
+
+
+
+
+
+
 
   const otp = otpGenerator.generate(4, {
     digits: true,
@@ -212,53 +227,117 @@ exports.signup = catchAsync(async (req, res, next) => {
     upperCaseAlphabets: false,
     specialChars: false,
   });
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: true, // true for 465, false for other ports
+    auth: {
+      user: "youthbuzz00@gmail.com",
+      pass: "viqiqwwdppyjtntd" // generated ethereal password
+    },
+  });
 
-  try {
-    // Send OTP via Firebase phone number verification using createSessionCookie
-    const sessionCookie = await admin.auth().createSessionCookie(
-      phoneNumber,
-      {
-        expiresIn: 5 * 60 * 1000, // Customize the expiration time
-        phoneNumber: phoneNumber,
-      }
-    );
+  const mailGenerator = new Mailgen({
+    theme: 'salted', // Choose a Mailgen theme (e.g., 'salted' or 'neopolitan')
+    product: {
+      name: 'portal.youthbuzz.in',
+      link: 'https://yourapp.com',
+      // You can customize other product details here
+    },
+  });
 
-    const time = new Date();
-    time.setMinutes(time.getMinutes() + 5);
+  // Function to send OTP via email
+  const sendOTPEmail = () => {
+    // Create a Mailgen email template
+    const email2 = {
+      body: {
+        name: name, // Customize the recipient's name
+        intro: `Your OTP for verification is:${otp}`,
+        // code: otp, // Replace with your generated OTP
 
-    const OTP = {
-      OTP: otp,
-      createdAt: new Date().toLocaleTimeString(),
-      expiresAt: time.toLocaleTimeString(),
-      sessionCookie, // Save this for OTP verification
+        outro: 'If you did not request this OTP, please ignore this email.',
+      },
     };
 
-    const dateOnly = DOB.split('T')[0];
-    const newusers = new User({
-      name: name,
-      email: email,
-      lastname: lastname,
-      password: password,
-      confirm_password: confirm_password,
-      OTP: OTP,
-      gender: gender,
-      DOB: dateOnly,
-      phoneNumber: phoneNumber,
-      country: country,
+    // Generate the email HTML using Mailgen
+    const emailBody = mailGenerator.generate(email2);
+
+    // Create email options
+    const mailOptions = {
+      from: 'youthbuzz00@gmail.com',
+      to: email,
+      subject: 'OTP Verification',
+      html: emailBody,
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending OTP email:', error);
+      } else {
+        console.log('OTP email sent:', info.response);
+      }
+    });
+  };
+
+  sendOTPEmail()
+
+  const time = new Date();
+  time.setMinutes(time.getMinutes() + 5);
+
+  const OTP = {
+    OTP: otp,
+    createdAt: new Date().toLocaleTimeString(),
+    expiresAt: time.toLocaleTimeString(),
+  };
+  
+
+  const newusers = new User({
+    name: name,
+    email: email,
+    lastname:lastname,
+    password: password,
+    confirm_password: confirm_password,
+    OTP: OTP,
+    country:country,
+    phoneNumber:phoneNumber,
+    gender:gender,
+    DOB:DOB
     });
 
-    const savedResponse = await newusers.save();
+  const savedResponse = await newusers.save();
 
-    createAndSendToken(savedResponse, 201, res);
-  } catch (error) {
-    console.error('Error sending OTP via Firebase:', error);
-    // Handle the error, e.g., return an error response to the client
-    res.status(500).json({
-      status: false,
-      message: 'Error sending OTP via Firebase',
-    });
-  }
+  createAndSendToken(savedResponse, 201, res);
 });
+exports.verify = async (req, res) => {
+  const { OTP } = req.body;
+
+  // Assuming 'User' is your model name
+  const user = await User.findOne({ 'OTP.OTP': OTP });
+
+  if (!user) {
+    res.status(400).send('Invalid OTP');
+
+  } else {
+    const currentTime = new Date().getTime();
+    const expiresAt = new Date(user.OTP.expiresAt).getTime();
+
+    if (currentTime > expiresAt) {
+      res.status(400).send('OTP has expired');
+    } else {
+      await User.findOneAndUpdate({ 'OTP.OTP': OTP }, { $unset: { OTP: 1 },verified:true });
+
+      res.status(201).json({
+         statusbar:"true"
+      })
+  
+    }
+  }
+};
+
+
+
 
 exports.resendOTP = catchAsync(async (req, res, next) => {
   const { email } = req.body;
@@ -291,7 +370,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
     service: "gmail",
     host: "smtp.gmail.com",
     port: 587,
-    secure: false, // true for 465, false for other ports
+    secure: true, // true for 465, false for other ports
     auth: {
       user: "youthbuzz00@gmail.com",
       pass: "viqiqwwdppyjtntd" // generated ethereal password
