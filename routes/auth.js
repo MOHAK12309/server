@@ -12,7 +12,7 @@ router.patch('/update/:id', auth.updateUser)
 router.patch('/updatePhoto/:id', auth.uploadUserPhoto)
 router.get('/logout', auth.logout);
 router.post('/resend', auth.resendOTP);
-// router.post('/verify', auth.verify);
+router.post('/verify', auth.verify);
 
 router.post('/forgot', auth.forgotPassword);
 router.post('/reset/:token', auth.reset);
