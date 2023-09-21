@@ -18,7 +18,7 @@ const { upload } = require("../utils/s3")
 const { result, slice } = require("lodash");
 const Mailgen = require("mailgen")
 const admin = require('firebase-admin');
-const verify=require("../models/verify")
+
 
 
 
