@@ -501,104 +501,24 @@ exports.verify = async (req, res) => {
 
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return next(new AppError("please provide email and password", 400));
-  }
-  const user = await User.findOne({ email }).select("+password");
+  const { emailOrphoneNumber, password } = req.body;
 
-  if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError("incorrect pass and mail"), 401);
-  }
-  if (!user.verified) {
-    // Generate a new OTP for login
-    const newOTP = otpGenerator.generate(4, {
-      digits: true,
-      lowerCaseAlphabets: false,
-      upperCaseAlphabets: false,
-      specialChars: false,
-    });
+  // Check if emailOrPhone is an email
+  const isEmail = /\S+@\S+\.\S+/.test(emailOrphoneNumber);
 
-    // Update user's OTP and expiry in the database
-   user.OTP = {
-      OTP: newOTP,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // Set expiry for 5 minutes from now
-    };
+  // Find the user by email or phone
+  const user = await User.findOne(isEmail ? { email: emailOrphoneNumber } : { phoneNumber: emailOrphoneNumber })
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  // Compare passwords
  
-    await user.save()
- 
+  createAndSendToken(user, 201,  res)
 
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: true, // true for 465, false for other ports
-      auth: {
-        user: "youthbuzz00@gmail.com",
-        pass: "viqiqwwdppyjtntd" // generated ethereal password
-      },
-    });
+})
 
-    const mailGenerator = new Mailgen({
-      theme: 'salted', // Choose a Mailgen theme (e.g., 'salted' or 'neopolitan')
-      product: {
-        name: 'portal.youthbuzz.in',
-        link: 'https://yourapp.com',
-        // You can customize other product details here
-      },
-    });
-  
-    // Function to send OTP via email2
-    const sendOTPemail2 = () => {
-      // Create a Mailgen email2 template
-      const email22 = {
-        body: {
-           // Customize the recipient's name
-          intro: `Your OTP for verification is:${newOTP}`,
-          // code: otp, // Replace with your generated OTP
-  
-          outro: 'If you did not request this OTP, please ignore this email2.',
-        },
-      };
-
-      const email2Body = mailGenerator.generate(email22);
-  
-      // Create email2 options
-      const mailOptions = {
-        from: 'youthbuzz00@gmail.com',
-        to: email,
-        subject: 'OTP Verification',
-        html: email2Body,
-      };
-  
-      // Send the email2
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error('Error sending OTP email2:', error);
-        } else {
-          console.log('OTP email2 sent:', info.response);
-        }
-      });
-    };
-  
-    sendOTPemail2()
-
-    return res.status(200).json({
-      status: "false",
-      message: "Account is not verified. New OTP has been sent to your email.",
-    });
-  }
-
-  createAndSendToken(user, 200, res);
-  //     const token=jwt.sign({id:user._id},'this-is-my-super-longer-secret',{
-  //         expiresIn:'90d'
-  //       });
-  //     res.status(200).json({
-  //     statusbar:'success',
-  //     token
-  //     })
-});
 exports.loginWithOtp = catchAsync(async (req, res, next) => {
   const { phoneNumber } = req.body;
 
