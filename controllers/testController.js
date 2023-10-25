@@ -24,40 +24,22 @@ const admin = require('firebase-admin');
 
 
 exports.signup3 =catchAsync(async (req, res) => {
-   const {username} = req.body
+    const newUser2 = await User2.create({
    
-    const user = await User2.findOne({username:username})
-    if(username){
-        res.status(201).json({
+        username: req.body.username,
+    
+       
+      
+    });
+    res.status(201).json(
+        {
             statusbar:"true",
-            message:"welocome back",
             data:{
-                user
+                newUser2
+
             }
-
-        })
-    }else{
-        const newUser2 = await User2.create({
-   
-            username: req.body.username,
-        
-           
-          
-        });
-        res.status(201).json(
-            {
-                statusbar:"true",
-                message:"welocome",
-                data:{
-                    newUser2
-    
-                }
-            }
-        )
-
-    }
-
-    
+        }
+    )
   
   });
   exports.updateUser2 = catchAsync(async (req, res) => {
@@ -75,7 +57,7 @@ exports.signup3 =catchAsync(async (req, res) => {
       }
     });
   });
-  exports.getOneuser2 = catchAsync(async (req, res) => {
+  exports.getOneuser = catchAsync(async (req, res) => {
     const user = await User2.findById(req.params.id)
     res.status(200).json(
       {
