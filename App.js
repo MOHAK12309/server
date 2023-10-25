@@ -10,6 +10,7 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const compression = require('compression');
 const auth=require("./routes/auth")
+const auth2=require("./routes/testRoute")
 // const verify=require("./routes/verify")
 // const admin=require("./routes/adminRoute")
 // const upcoming=require("./routes/upcomingRoutes")
@@ -81,6 +82,7 @@ app.use((req, res, next) => {
 // app.use("/api/v1/mail",contact)
 // app.use('/api/v1/blogs', blog);
 app.use('/api/v1/user', auth);
+app.use('/api/v1/test', auth2);
 // app.use('/api/v1/verify', verify);
 // app.use('/api/v1/admin', admin);
 // app.use("/auth", googleOathRouter)
