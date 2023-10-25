@@ -57,15 +57,14 @@ exports.signup3 =catchAsync(async (req, res) => {
       }
     });
   });
-  exports.getOneuser = catchAsync(async (req, res) => {
-    const user = await User2.findById(req.params.id)
-    res.status(200).json(
-      {
-        status: "true",
-        data: {
-          user
-        }
+  exports.getOneuser2 = catchAsync(async (req, res) => {
+  const user = await User2.findById(req.params.id)
+  res.status(200).json(
+    {
+      status: "true",
+      data: {
+        user
       }
-    )
-  })
-  
+    }
+  )
+})
