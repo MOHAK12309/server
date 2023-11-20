@@ -6,80 +6,41 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const AppError = require("../utils/appError");
-
 const catchAsync = require("../utils/catchAsync");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const _ = require("lodash");
 const axios = require("axios");
 const otpGenerator = require("otp-generator");
-const { upload } = require("../utils/s3")
-
+const { upload } = require("../utils/s3");
 const { result, slice } = require("lodash");
-const Mailgen = require("mailgen")
-const admin = require('firebase-admin');
-
-
-
-
-// admin.initializeApp({
-//   credential: admin.credential.cert({
-    
-//       "type": "service_account",
-//       "project_id": "youthbuzzwebtest",
-//       "private_key_id": "78cabc1a5575243ba47cabc19eab8333f25fbadb",
-//       "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDnctYhJHJJ8xNc\nDSNwp4RpF1XnSVXC2c1XgcL8a5qy50JEOH9vT9Mgobv6u/JE5a8PlS82SBTZ9aBu\nmafeeHFB20GeRn/P4dVJlnA+03dsUU6F5ZdKGAkEPgeQUnvq5mHWMTg/2S19iPza\nmxAl1jG3ODPPFeowMWbgwKZUlaT+dm32E+xQtjNyIFmm3yNNWnZWbUbgEV7m+jod\nXd/KkKvbS6KFFk/LXdcpJ/kKqKwU/4Msc9gdMh09eipVRw2G8MNr0m4PYOGj6J+K\neVZ+E/IKdlVhk2k2u2EQpwiLk2ILLG+KotM2H6t8kNNVUbMWCe4dCOMTOrq3AHfi\nAQtLgVNxAgMBAAECggEAFhcIxusCmXpAu8VpP4RNh/Y5NbTzIYDGL3bsFEl032Rh\nF7/IsegNf4zQMzMjAV5mofccJXMlwlPGNyglNH+MV7vEfIXAByhHwhlAp05plIYC\nF5d9JA49NhFxiV3GA/pvFhFmi/l/dP7RG1A3b1UNM66Ci15NFsJwTj004tfRgpO+\nj7jD9oMgAK2mtdSImjZtSX5zXGHzBeCJjVM9IY41FkU0ajEyYtj2jklFhTf3RZuk\nqlsWIY8sCf/5dfG4weOiAmJBC0pCRHtb9GFnZ4YNiHjgFUXZGO74B9wuwqOIsMjb\nbzqqG6xpmOBzX0QLmSIVv9RoPdQwpXd2lX8oUdXLHQKBgQD/oypXIE5SP9MswZhJ\nKECUZyKEHNpHIqEym47jfiAQ+R2ckDf173Yx5mdM/S52305GxgsI+MNBBiy0MW2G\nbqieaGnJwBoW0fMzwg3Vv/VEaS1CqiTZH8qY6AMMykQJ3xBPJF4T96EEDyVPizh1\nxdA8FgKeZ25keRo6A+4kk5tyJwKBgQDnxuMMHMHRFEZoDoV+em7osOOB29c5f4av\nw8A7qZOST2cWuG9VJoq5YwKnnMjkEYQfdunKvJaTezNKRPPQsq80HWMEbO+3mE60\n2URtGby8q3WpPa0VpOocuLIebYURhNFX7yqKMEWMpi8jDIwgvSVRhkLL94lxOhay\njX+nCSzEpwKBgQCo2wUHoc46I/CAOqw1foIRxIIXE9vWavhhLkFW4SObMoGtvdFJ\nANBoq5EGWKINYPkaZIw7c929IK/8oj1/M67rW3qtCdfxxOJJCOAMlYwTkQmVZD+M\nr6QqFe6VzzDb+FyUeiguNj5EKSDzBrnXiT8/wSYfraBMe3WoZpoxzNI7twKBgQCR\nnJTF5kcpqHg3JXBermKBU6gKzGehmumuAOgDU5z/nVzhnEttjoI2x+pCDTD0f8Cm\n19k3YlWjIBJwBXO72JZTwmaTwDC2AjzoR1tCw5mcWofYJIRaBbqDAtH8Zcfk4rF2\nci4ilQMMwtb4SQi8BLiuSBAs/j3d4aWi1VyuPwheHwKBgQCjAiLjiCQ2mCchoLvw\nzM+H81Mm2KMjp/ZTvBV6DS/g2odLCX1GqENrCGLKFw5VejweMNUKLwt4k0TbWJr9\nWVbBIkYfGa5KHLgZxOuTSc+o8h5jmzClE02le93ZVFXr7HDJ5cm+t9s/jsWgHrbi\nvVsevWooAZCtWfKUaCuW6tdxuQ==\n-----END PRIVATE KEY-----\n",
-//       "client_email": "firebase-adminsdk-a744y@youthbuzzwebtest.iam.gserviceaccount.com",
-//       "client_id": "107654070045600469214",
-//       "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-//       "token_uri": "https://oauth2.googleapis.com/token",
-//       "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-//       "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-a744y%40youthbuzzwebtest.iam.gserviceaccount.com",
-//       "universe_domain": "googleapis.com"
-//     }
-    
-  
-//   ),
-// });
-
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyBjepGG8G886Y_AKHW5BYtdasJG-6JmhYc",
-//   authDomain: "youthbuzzwebtest.firebaseapp.com",
-//   projectId: "youthbuzzwebtest",
-//   storageBucket: "youthbuzzwebtest.appspot.com",
-//   messagingSenderId: "786059551387",
-//   appId: "1:786059551387:web:302299035e292bc4465c3e",
-//   measurementId: "G-JBSKGP91C9"
-// };
-// // Your user's phone number
-
-//   admin.initializeApp(firebaseConfig);
+const Mailgen = require("mailgen");
+const admin = require("firebase-admin");
 
 exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
-
-
-  const uploadSingle = upload("youthbuzzdata", "userData/", "user").single('photo');
+  const uploadSingle = upload("youthbuzzdata", "userData/", "user").single(
+    "photo"
+  );
   uploadSingle(req, res, async (err) => {
     if (err) {
       return next(new AppError(err.message, 400));
     }
     if (req.file) {
-      req.body.photo = req.file.key
+      req.body.photo = req.file.key;
     }
-    console.log(req.file)
+    console.log(req.file);
     const blog = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true
+      runValidators: true,
     });
     res.status(201).json({
       status: "success",
       message: "Image uploaded successfully",
       data: {
-        blog
-      }
-    })
-  })
+        blog,
+      },
+    });
+  });
 });
 
 const singnup = (id) => {
@@ -105,19 +66,16 @@ const createAndSendToken = (user, statusCode, res) => {
   });
 };
 
-
-
 // Set up Nodemailer transporter
 const transporter = nodemailer.createTransport({
-  service: 'Gmail',
+  service: "Gmail",
   auth: {
     user: "careerclassroom4@gmail.com",
-    pass: "viqiqwwdppyjtntd"
+    pass: "viqiqwwdppyjtntd",
   },
 });
 
 // Configure Express session
-
 
 // API route to register user and send OTP
 exports.register = async (req, res) => {
@@ -137,23 +95,22 @@ exports.register = async (req, res) => {
 
     // Send OTP email
     const mailOptions = {
-      from: 'careerclassroom4@gmail.com',
+      from: "careerclassroom4@gmail.com",
       to: email,
-      subject: 'OTP Verification',
+      subject: "OTP Verification",
       text: `Your OTP: ${otp}`,
-
     };
     await transporter.sendMail(mailOptions);
 
     res.status(200).json({
       status: "success",
-      message: 'OTP sent successfully'
+      message: "OTP sent successfully",
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
-}
+};
 
 // API route to verify OTP and manage session
 // exports.verify = async (req, res) => {
@@ -162,7 +119,6 @@ exports.register = async (req, res) => {
 //   try {
 //     // Get OTP from the session
 //     const sessionOtp = req.session.otp;
-
 
 //     if (!sessionOtp || sessionOtp !== otp) {
 //       return res.status(400).json({ error: 'Incorrect OTP' });
@@ -184,18 +140,14 @@ exports.register = async (req, res) => {
 // Protected route requiring verification
 
 exports.getOneuser = catchAsync(async (req, res) => {
-  const user = await User.findById(req.params.id)
-  res.status(200).json(
-    {
-      status: "true",
-      data: {
-        user
-      }
-    }
-  )
-})
-
-
+  const user = await User.findById(req.params.id);
+  res.status(200).json({
+    status: "true",
+    data: {
+      user,
+    },
+  });
+});
 
 // exports.signup = catchAsync(async (req, res, next) => {
 //   const {  email } = req.body;
@@ -215,12 +167,6 @@ exports.getOneuser = catchAsync(async (req, res) => {
 //       message: "email is already registered. please login",
 //     });
 //   }
-
-
-
-
-
-
 
 //   const otp = otpGenerator.generate(4, {
 //     digits: true,
@@ -292,44 +238,51 @@ exports.getOneuser = catchAsync(async (req, res) => {
 //     createdAt: new Date().toLocaleTimeString(),
 //     expiresAt: time.toLocaleTimeString(),
 //   };
-  
 
 //   const newusers = new User({
-    
+
 //     email: email,
-  
+
 //     OTP: OTP,
-    
+
 //     });
 
 //   const savedResponse = await newusers.save();
 
 //   createAndSendToken(savedResponse, 201, res);
 // });
-exports.signup2 =catchAsync(async (req, res) => {
-  const newUser = await User.create({
-    email: req.body.email,
-    lastname:req.body.lastname,
-    name: req.body.name,
-    password: req.body.password,
-    confirm_password: req.body.confirm_password,
-    gender: req.body.gender,
-    DOB:req.body.DOB,
-    phoneNumber:req.body.phoneNumber,
-    country:req.body.country
+exports.signup2 = catchAsync(async (req, res) => {
+  const uploadSingle = upload("youthbuzzdata", "userData/", "user").single(
+    "photo"
+  );
 
-     
-    
-  });
-  // const url = `${req.protocol}://${req.get('host')}/all-services`;
-  // await new sendEmail(newUser, url).sendWelcome();
+  uploadSingle(req, res, async (err) => {
+    if (err) {
+      return next(new AppError(err.message, 400));
+    }
+    if (req.file) {
+      req.body.photo = req.file.key;
+    }
+    console.log(req.file);
+    const newUser = await User.create({
+      email: req.body.email,
+      lastname: req.body.lastname,
+      name: req.body.name,
+      password: req.body.password,
+      confirm_password: req.body.confirm_password,
+      gender: req.body.gender,
+      DOB: req.body.DOB,
+      phoneNumber: req.body.phoneNumber,
+      country: req.body.country,
+      photo: req.body.photo,
+    });
+
+    // const url = `${req.protocol}://${req.get('host')}/all-services`;
+    // await new sendEmail(newUser, url).sendWelcome();
     console.log(newUser);
-  createAndSendToken(newUser, 201,  res)
+    createAndSendToken(newUser, 201, res);
+  });
 });
-
-
-
-
 
 exports.resendOTP = catchAsync(async (req, res, next) => {
   const { email } = req.body;
@@ -365,15 +318,15 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
     secure: true, // true for 465, false for other ports
     auth: {
       user: "youthbuzz00@gmail.com",
-      pass: "viqiqwwdppyjtntd" // generated ethereal password
+      pass: "viqiqwwdppyjtntd", // generated ethereal password
     },
   });
 
   const mailGenerator = new Mailgen({
-    theme: 'salted', // Choose a Mailgen theme (e.g., 'salted' or 'neopolitan')
+    theme: "salted", // Choose a Mailgen theme (e.g., 'salted' or 'neopolitan')
     product: {
-      name: 'portal.youthbuzz.in',
-      link: 'https://yourapp.com',
+      name: "portal.youthbuzz.in",
+      link: "https://yourapp.com",
       // You can customize other product details here
     },
   });
@@ -387,7 +340,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
         intro: `Your OTP for verification is:${otp}`,
         // code: otp, // Replace with your generated OTP
 
-        outro: 'If you did not request this OTP, please ignore this email.',
+        outro: "If you did not request this OTP, please ignore this email.",
       },
     };
 
@@ -396,18 +349,18 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
 
     // Create email options
     const mailOptions = {
-      from: 'careerclassroom4@gmail.com',
+      from: "careerclassroom4@gmail.com",
       to: email,
-      subject: 'OTP Verification',
+      subject: "OTP Verification",
       html: emailBody,
     };
 
     // Send the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error('Error sending OTP email:', error);
+        console.error("Error sending OTP email:", error);
       } else {
-        console.log('OTP email sent:', info.response);
+        console.log("OTP email sent:", info.response);
       }
     });
   };
@@ -446,34 +399,28 @@ exports.verify = async (req, res) => {
   const { OTP } = req.body;
 
   // Assuming 'User' is your model name
-  const user = await User.findOne({ 'OTP.OTP': OTP });
+  const user = await User.findOne({ "OTP.OTP": OTP });
 
   if (!user) {
-    res.status(400).send('Invalid OTP');
-
+    res.status(400).send("Invalid OTP");
   } else {
     const currentTime = new Date().getTime();
     const expiresAt = new Date(user.OTP.expiresAt).getTime();
 
     if (currentTime > expiresAt) {
-      res.status(400).send('OTP has expired');
+      res.status(400).send("OTP has expired");
     } else {
-      await User.findOneAndUpdate({ 'OTP.OTP': OTP }, { $unset: { OTP: 1 }, verified: true });
+      await User.findOneAndUpdate(
+        { "OTP.OTP": OTP },
+        { $unset: { OTP: 1 }, verified: true }
+      );
 
       res.status(201).json({
-        statusbar: "true"
-      })
-
+        statusbar: "true",
+      });
     }
   }
 };
-
-
-
-
-
-
-
 
 // Start the server
 
@@ -492,14 +439,6 @@ exports.verify = async (req, res) => {
 //   createAndSendToken(newUser, 201, res);
 // });
 
-
-
-
-
-
-
-
-
 exports.login = catchAsync(async (req, res, next) => {
   const { emailOrphoneNumber, password } = req.body;
 
@@ -507,17 +446,20 @@ exports.login = catchAsync(async (req, res, next) => {
   const isEmail = /\S+@\S+\.\S+/.test(emailOrphoneNumber);
 
   // Find the user by email or phone
-  const user = await User.findOne(isEmail ? { email: emailOrphoneNumber } : { phoneNumber: emailOrphoneNumber })
+  const user = await User.findOne(
+    isEmail
+      ? { email: emailOrphoneNumber }
+      : { phoneNumber: emailOrphoneNumber }
+  );
 
   if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+    return res.status(404).json({ message: "User not found" });
   }
 
   // Compare passwords
- 
-  createAndSendToken(user, 201,  res)
 
-})
+  createAndSendToken(user, 201, res);
+});
 
 exports.loginWithOtp = catchAsync(async (req, res, next) => {
   const { phoneNumber } = req.body;
@@ -526,18 +468,13 @@ exports.loginWithOtp = catchAsync(async (req, res, next) => {
     return next(new AppError("Please provide email and OTP.", 400));
   }
 
-  const user = await User.findOne({phoneNumber});
+  const user = await User.findOne({ phoneNumber });
 
   if (!user) {
-    res.status(400).send('Invalid OTP');
-
-  } 
-  createAndSendToken(user,201,res)
-
-    
-  
+    res.status(400).send("Invalid OTP");
+  }
+  createAndSendToken(user, 201, res);
 });
-
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -585,7 +522,9 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError("There is no user with the provided email address.", 404));
+    return next(
+      new AppError("There is no user with the provided email address.", 404)
+    );
   }
 
   // 2) Generate the random reset token
@@ -593,7 +532,9 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3) Send it to the user's email
-  const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/reset/${resetToken}`;
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/users/reset/${resetToken}`;
 
   try {
     let transporter = nodemailer.createTransport({
@@ -608,10 +549,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     });
 
     const mailGenerator = new Mailgen({
-      theme: 'salted',
+      theme: "salted",
       product: {
-        name: 'portal.youthbuzz.in',
-        link: 'https://yourapp.com',
+        name: "portal.youthbuzz.in",
+        link: "https://yourapp.com",
       },
     });
 
@@ -621,11 +562,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
         name: user.name, // Customize the recipient's name
         intro: "Forgot your password?",
         action: {
-          instructions: "Please reset your password by clicking the button below:",
+          instructions:
+            "Please reset your password by clicking the button below:",
           button: {
             color: "#007bff",
             text: "Reset Your Password",
-            link: `https://portal.youthbuzz.in/reset/${resetToken}` 
+            link: `https://youthbuzz.in/reset/${resetToken}`,
           },
         },
         outro: "If you didn't forget your password, please ignore this email.",
@@ -637,15 +579,15 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
     // Create email options
     const mailOptions = {
-      from: 'youthbuzz00@gmail.com',
+      from: "youthbuzz00@gmail.com",
       to: user.email,
-      subject: 'Password Reset',
+      subject: "Password Reset",
       html: emailBody,
     };
 
     // Send the email
     const info = await transporter.sendMail(mailOptions);
-    console.log('Password reset email sent:', info.response);
+    console.log("Password reset email sent:", info.response);
 
     // Send a response to the client
     res.status(200).json({
@@ -663,7 +605,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     );
   }
 });
-
 
 exports.reset = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
@@ -737,8 +678,8 @@ exports.deleteuser = catchAsync(async (req, res, next) => {
     return next(new AppError(`No ${seller} found with that ID`, 404));
   }
   res.status(204).json({
-    status: 'success',
-    data: null
+    status: "success",
+    data: null,
   });
 });
 
@@ -776,23 +717,23 @@ exports.deleteuser = catchAsync(async (req, res, next) => {
 exports.updateUser = catchAsync(async (req, res) => {
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true
+    runValidators: true,
   });
   if (!user) {
-    return next(new AppError(`No seller found with that ID`, 404))
+    return next(new AppError(`No seller found with that ID`, 404));
   }
   res.status(201).json({
-    status: 'success',
+    status: "success",
     data: {
-      user
-    }
+      user,
+    },
   });
 });
 
 exports.logout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
+  res.cookie("jwt", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: false,
   });
-  res.status(200).json({ status: 'success' });
+  res.status(200).json({ status: "success" });
 };
