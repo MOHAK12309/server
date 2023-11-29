@@ -551,7 +551,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     const mailGenerator = new Mailgen({
       theme: "salted",
       product: {
-        name: "portal.youthbuzz.in",
+        name: "youthbuzz.in",
         link: "https://yourapp.com",
       },
     });
