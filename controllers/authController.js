@@ -252,36 +252,23 @@ exports.getOneuser = catchAsync(async (req, res) => {
 //   createAndSendToken(savedResponse, 201, res);
 // });
 exports.signup2 = catchAsync(async (req, res) => {
-  const uploadSingle = upload("youthbuzzdata", "userData/", "user").single(
-    "photo"
-  );
+  const newUser = await User.create({
+    email: req.body.email,
+   
+    name: req.body.name,
+    phoneNumber:req.body.phoneNumber,
+    desc:req.body.desc
 
-  uploadSingle(req, res, async (err) => {
-    if (err) {
-      return next(new AppError(err.message, 400));
-    }
-    if (req.file) {
-      req.body.photo = req.file.key;
-    }
-    console.log(req.file);
-    const newUser = await User.create({
-      email: req.body.email,
-      lastname: req.body.lastname,
-      name: req.body.name,
-      password: req.body.password,
-      confirm_password: req.body.confirm_password,
-      gender: req.body.gender,
-      DOB: req.body.DOB,
-      phoneNumber: req.body.phoneNumber,
-      country: req.body.country,
-      photo: req.body.photo,
-    });
 
-    // const url = `${req.protocol}://${req.get('host')}/all-services`;
-    // await new sendEmail(newUser, url).sendWelcome();
-    console.log(newUser);
-    createAndSendToken(newUser, 201, res);
+
+
+   
   });
+
+  // const url = `${req.protocol}://${req.get('host')}/all-services`;
+  // await new sendEmail(newUser, url).sendWelcome();
+  console.log(newUser);
+  createAndSendToken(newUser, 201, res);
 });
 
 exports.resendOTP = catchAsync(async (req, res, next) => {
@@ -683,36 +670,7 @@ exports.deleteuser = catchAsync(async (req, res, next) => {
   });
 });
 
-// Generate OTP and send email
-// exports.sentOtp= async (req, res) => {
-//   const { email } = req.body;
-//   const generatedOTP = otpGenerator.generate(6, { upperCase: false, specialChars: false });
 
-//   const user = new User({
-//     email,
-//     otp: generatedOTP,
-//     otpExpiry: new Date().getTime() + 5 * 60 * 1000, // OTP valid for 5 minutes
-//   });
-
-//   await user.save();
-
-//   const mailOptions = {
-//     from: 'your-email@gmail.com',
-//     to: email,
-//     subject: 'Your OTP Code',
-//     text: `Your OTP code is: ${generatedOTP}`,
-//   };
-
-//   transporter.sendMail(mailOptions, (error, info) => {
-//     if (error) {
-//       console.log(error);
-//       res.status(500).send('Error sending OTP');
-//     } else {
-//       console.log('Email sent: ' + info.response);
-//       res.send('OTP sent successfully');
-//     }
-//   });
-// }
 
 exports.updateUser = catchAsync(async (req, res) => {
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {

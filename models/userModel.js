@@ -9,113 +9,62 @@ const crypto = require("crypto");
 // const usercontrolleer = require("./controllerUser");
 
 const user_schema = new mongoose.Schema({
-    name: {
-        type: String,
+  name: {
+    type: String,
+  },
+  lastname: {
+    type: String,
+  },
+  email: {
+    type: String,
 
-    },
-    lastname: {
-        type: String
-    },
-    email: {
-        type: String,
+    unique: true,
+    lowercase: true,
+  },
+  desc: {
+    type:String
+  },
 
-        // unique: true,
-        lowercase: true,
-    },
-    country: {
-        type: String
-
-    },
-    phoneNumber: {
-        type: String
-    },
-    DOB:{
-        type:Date
-
-    },
-
-
-
-    password: {
-        type: String,
-        // required: true,
-        minlength: 8,
-        select: false,
-    },
-    confirm_password: {
-        type: String,
-        // required: true,
-        minlength: 8,
-        validate: {
-            validator: function (el) {
-                return el == this.password;
-            },
-        },
-    },
-    Passwordchanged: Date,
-    passwordResetToken: String,
-    passwordResetExpires: Date,
-
-    OTP: {
-        type: Object,
-    },
-    verified: {
-        type: Boolean,
-        default: false
-    },
-    gender:{
-        type:String
-    },
-    country:{
-        type:String
-    },
-    photo: {
-        type : String
-            },
+  phoneNumber: {
+    type: String,
+  },
 });
 user_schema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password, 12);
-    this.confirm_password = undefined;
-    next();
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  this.confirm_password = undefined;
+  next();
 });
 user_schema.methods.correctPassword = async function (
-    candidatePassword,
-    userPassword
-
-
-) 
-
-{
-    console.log('Candidate Password:', candidatePassword);
-    console.log('User Password:', userPassword);
-    return await bcrypt.compare(candidatePassword, userPassword);
+  candidatePassword,
+  userPassword
+) {
+  console.log("Candidate Password:", candidatePassword);
+  console.log("User Password:", userPassword);
+  return await bcrypt.compare(candidatePassword, userPassword);
 };
 user_schema.methods.changePasswordAfter = function (JWTTimestamp) {
-    if (this.Passwordchanged) {
-        const changedTimestamp = parseInt(
-            this.Passwordchanged.getTime() / 1000,
-            
-        );
-        console.log(this.Passwordchanged, JWTTimestamp);
-        return JWTTimestamp < changedTimestamp;
-    }
-    return false;
+  if (this.Passwordchanged) {
+    const changedTimestamp = parseInt(this.Passwordchanged.getTime() / 1000);
+    console.log(this.Passwordchanged, JWTTimestamp);
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
 };
 
 user_schema.methods.createPasswordResetToken = function () {
-    const resetToken = crypto.randomBytes(32).toString("hex");
+  const resetToken = crypto.randomBytes(32).toString("hex");
 
-    this.passwordResetToken = crypto
-        .createHash("sha256")
-        .update(resetToken)
-        .digest("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
-    console.log({ resetToken }, this.passwordResetToken);
+  console.log({ resetToken }, this.passwordResetToken);
 
-    this.passwordResetExpires = Date.now() + 3600000;
+  this.passwordResetExpires = Date.now() + 3600000;
 
-    return resetToken;
+  return resetToken;
 };
 
 // user_schema.methods.SendOtp=async function(){
@@ -132,4 +81,3 @@ user_schema.methods.createPasswordResetToken = function () {
 // })}
 const user = mongoose.model("user", user_schema);
 module.exports = user;
-
