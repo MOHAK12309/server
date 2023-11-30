@@ -76,7 +76,7 @@ app.use((req, res, next) => {
 
 
 
-app.use(cors('*'))
+
 
 // Routes
 // app.use("/api/v1/mail",contact)
