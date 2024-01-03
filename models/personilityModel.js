@@ -15,6 +15,11 @@ const test_schema = new mongoose.Schema({
     
 
     },
+    amount:{
+        type:Number,
+        default:5
+    },
+
     testNumber:{
         type: String,
 

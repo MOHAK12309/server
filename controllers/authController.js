@@ -42,6 +42,57 @@ exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
     });
   });
 });
+exports.coinFunction = catchAsync(async (req, res) => {
+  const userId = req.params.id;
+  const amount = req.body.amount;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (user && user.yourCoin >= amount) {
+      const updatedCoins = user.yourCoin - amount;
+
+      // Update the user's yourCoin field
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: userId },
+        { $set: { yourCoin: updatedCoins, testBuy: true } },
+        { new: true }
+      );
+
+      console.log("Updated user:", updatedUser);
+
+      // Return success response or perform additional actions
+      res.status(200).json({
+        status: true,
+        message: "Coins subtracted successfully. Testbuy set to true.",
+        updatedUser: updatedUser,
+      });
+
+      // Schedule a timer to set testbuy back to false after 30 minutes
+      setTimeout(async () => {
+        const resetTestBuy = await User.findOneAndUpdate(
+          { _id: userId },
+          { $set: { testBuy: false } },
+          { new: true }
+        );
+
+        console.log("Testbuy set back to false after 30 minutes:", resetTestBuy);
+      }, 30 * 60 * 1000); // 30 minutes in milliseconds
+    } else {
+      console.log("User not found or coins are not sufficient.");
+      res.status(404).json({
+        status: false,
+        message: "User not found or coins are not sufficient.",
+      });
+    }
+  } catch (error) {
+    console.error("Error in coinFunction:", error);
+    res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+    });
+  }
+});
 
 const singnup = (id) => {
   return jwt.sign({ id }, "this-is-my-super-longer-secret", {

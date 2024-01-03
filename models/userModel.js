@@ -33,6 +33,10 @@ const user_schema = new mongoose.Schema({
     phoneNumber: {
         type: String
     },
+    testBuy:{
+        type:Boolean,
+        default:false
+    },
     DOB:{
         type:Date
 

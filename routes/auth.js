@@ -18,6 +18,7 @@ router.post('/forgot', auth.forgotPassword);
 router.post('/reset/:token', auth.reset);
 router.get('/getOneuser/:id', auth.getOneuser);
 router.patch("/updatepass/:id", auth.updatePassword)
+router.patch("/updatecoin/:id", auth.coinFunction)
 router.delete("/delete/:id", auth.deleteuser)
 module.exports = router
 // Mohak@12345
