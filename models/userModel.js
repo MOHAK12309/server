@@ -22,6 +22,10 @@ const user_schema = new mongoose.Schema({
         // unique: true,
         lowercase: true,
     },
+    yourCoin:{
+        type:Number,
+        default:5000
+    },
     country: {
         type: String
 
