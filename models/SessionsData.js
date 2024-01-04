@@ -22,6 +22,10 @@ const SessionDataScheme1 = new mongoose.Schema({
     TotalPlayers:{
         type: String,
     },
+    status:{
+        type:Boolean,
+        default:true
+    }
 })
 
 const SessionDataNow = mongoose.model("SessionDataNow",SessionDataScheme1)

@@ -68,16 +68,9 @@ exports.coinFunction = catchAsync(async (req, res) => {
         updatedUser: updatedUser,
       });
 
-      // Schedule a timer to set testbuy back to false after 30 minutes
-      setTimeout(async () => {
-        const resetTestBuy = await User.findOneAndUpdate(
-          { _id: userId },
-          { $set: { testBuy: false } },
-          { new: true }
-        );
-
-        console.log("Testbuy set back to false after 30 minutes:", resetTestBuy);
-      }, 30 * 60 * 1000); // 30 minutes in milliseconds
+      // Schedule a timer to set testbuy back to false after 5 seconds
+   // 5000 milliseconds = 5 seconds
+  
     } else {
       console.log("User not found or coins are not sufficient.");
       res.status(404).json({
@@ -93,6 +86,7 @@ exports.coinFunction = catchAsync(async (req, res) => {
     });
   }
 });
+
 
 const singnup = (id) => {
   return jwt.sign({ id }, "this-is-my-super-longer-secret", {
