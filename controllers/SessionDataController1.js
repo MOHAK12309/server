@@ -18,30 +18,21 @@ const Mailgen = require("mailgen");
 const admin = require("firebase-admin");
 
 exports.CreateData = async (req, res) => {
-    try {
-      // Set a timeout to create the session after 10 seconds
-      setTimeout(async () => {
-        const session = await SessionDataController.create({
-          location: req.body.location,
-          Date: req.body.Date,
-          StartTime: req.body.StartTime,
-          EndTime: req.body.EndTime,
-          TotalPlayers: req.body.TotalPlayers,
-        });
-  
-        res.status(201).json({
-          status: "Success",
-          Data: {
-            session,
-          },
-        });
-      }, 10 * 1000); // 10 seconds in milliseconds
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        status: "Error",
-        message: "Internal Server Error",
-      });
-    }
-  };
-  
+  try {
+    const session = await SessionDataController.create({
+      location: req.body.location,
+      Date: req.body.Date,
+      StartTime: req.body.StartTime,
+      EndTime: req.body.EndTime,
+      TotalPlayers: req.body.TotalPlayers,
+    });
+    res.status(201).json({
+      status: "Success",
+      Data: {
+        session,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
