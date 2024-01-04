@@ -1,4 +1,4 @@
-const SessionDataController = require("../models/SessionsData1");
+const SessionDataController = require("../models/SessionsData");
 const { promisify } = require("util");
 const express = require("express");
 const mongoose = require("mongoose");
