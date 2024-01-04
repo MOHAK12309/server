@@ -20,9 +20,12 @@ const session=require("express-session")
 // const linkedinOathRouter = require('./routes/linkedln-outh');
 // const  googleOathRouter  = require('./routes/googleRouter');
 
+const Sessdata=require("./routes/SessionDataRoute1")
+
 const cors = require('cors');
 
 const app = express();
+
 
 app.use(express.static("public"))
 app.enable('trust-proxy');
@@ -83,6 +86,7 @@ app.use((req, res, next) => {
 // app.use('/api/v1/blogs', blog);
 app.use('/api/v1/user', auth);
 app.use('/api/v1/test', auth2);
+app.use('/api/v1/session',Sessdata)
 // app.use('/api/v1/verify', verify);
 // app.use('/api/v1/admin', admin);
 // app.use("/auth", googleOathRouter)
