@@ -37,7 +37,7 @@ exports.CreateData = async (req, res) => {
         await User.findByIdAndUpdate(userId, { status: false });
   
         console.log(`User status updated to false after 5 minutes for user ID: ${userId}`);
-      }, 20000); // 5 minutes in milliseconds
+      }, 10000); // 5 minutes in milliseconds
   
       res.status(201).json({
         status: "Success",
