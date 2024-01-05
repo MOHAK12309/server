@@ -7,11 +7,14 @@ const AppError = require("../utils/appError");
 const crypto = require("crypto");
 
 const SessionDataScheme1 = new mongoose.Schema({
-    location:{
+    Location:{
         type: String,
     },
     Date:{
         type: String,
+    },
+    Duration:{
+        type:String
     },
     StartTime:{
         type: String,

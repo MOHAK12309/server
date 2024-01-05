@@ -25,6 +25,7 @@ exports.CreateData = async (req, res) => {
       StartTime: req.body.StartTime,
       EndTime: req.body.EndTime,
       TotalPlayers: req.body.TotalPlayers,
+      Duration: req.body.Duration,
     });
     res.status(201).json({
       status: "Success",
