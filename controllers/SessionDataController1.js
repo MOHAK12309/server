@@ -20,7 +20,7 @@ const admin = require("firebase-admin");
 exports.CreateData = async (req, res) => {
   try {
     const session = await SessionDataController.create({
-      location: req.body.location,
+      Location: req.body.Location,
       Date: req.body.Date,
       StartTime: req.body.StartTime,
       EndTime: req.body.EndTime,

@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const AppError = require("../utils/appError");
 const crypto = require("crypto");
 
-const customCollectionName = "playground";
+
 
 const SessionDataScheme1 = new mongoose.Schema({
   Location: {
@@ -31,8 +31,6 @@ const SessionDataScheme1 = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-}, {
-  collection: customCollectionName,
 });
 
 // Create a separate connection for this schema
