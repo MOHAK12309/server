@@ -9,7 +9,7 @@ const app = require('./App');
 
 mongoose.set('useCreateIndex',true)
 mongoose.set("strictQuery", true);
-mongoose.connect("mmongodb+srv://mohak:xpPb0L0OFzRt3CJu@cluster0.rcgseuy.mongodb.net/?retryWrites=true&w=majority",{
+mongoose.connect("mmongodb+srv://mohak:xpPb0L0OFzRt3CJu@cluster0.rcgseuy.mongodb.net/Master?retryWrites=true&w=majority",{
   useNewUrlParser:true,
   useUnifiedTopology:true
 },(err)=>{
