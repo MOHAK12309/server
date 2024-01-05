@@ -21,7 +21,7 @@ const session=require("express-session")
 // const  googleOathRouter  = require('./routes/googleRouter');
 
 const Sessdata=require("./routes/SessionDataRoute1")
-
+const ride=require("./routes/rideRoute")
 const cors = require('cors');
 
 const app = express();
@@ -87,6 +87,7 @@ app.use((req, res, next) => {
 app.use('/api/v1/user', auth);
 app.use('/api/v1/test', auth2);
 app.use('/api/v1/session',Sessdata)
+app.use('/api/v1/ride',ride)
 // app.use('/api/v1/verify', verify);
 // app.use('/api/v1/admin', admin);
 // app.use("/auth", googleOathRouter)
