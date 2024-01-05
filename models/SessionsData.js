@@ -38,7 +38,7 @@ const SessionDataScheme1 = new mongoose.Schema({
 // Create a separate connection for this schema
 mongoose.set('useCreateIndex',true)
 mongoose.set("strictQuery", true);
-const customDbConnection = mongoose.createConnection("mongodb+srv://mohak:xpPb0L0OFzRt3CJu@cluster0.rcgseuy.mongodb.net/Playground?retryWrites=true&w=majority", {
+const customDbConnection = mongoose.createConnection("mongodb+srv://mohak:xpPb0L0OFzRt3CJu@cluster0.rcgseuy.mongodb.net/SessionData?retryWrites=true&w=majority", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
