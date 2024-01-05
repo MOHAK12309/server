@@ -24,10 +24,20 @@ const SessionDataScheme1 = new mongoose.Schema({
     type: [],
   },
   Reviews: {
-    type: String,
+    type: [{
+      userReview:{
+        type:String
+      },
+      userRating:{
+        type:Number
+      },
+      userName:{
+        type:String
+      }
+    }],
   },
   Rating: {
-    type: String,
+    type: Number,
   },
   Description: {
     type: String,
@@ -50,6 +60,6 @@ const customDbConnection = mongoose.createConnection(
 );
 
 // Create a model using the schema and the custom connection
-const SessionData = customDbConnection.model("SessionData", SessionDataScheme1);
+const RideData = customDbConnection.model("RideData", SessionDataScheme1);
 
-module.exports = SessionData;
+module.exports = RideData;
