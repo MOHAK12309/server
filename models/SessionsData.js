@@ -32,9 +32,18 @@ const SessionDataScheme1 = new mongoose.Schema({
     default: true,
   },
 }, {
-  collection: customCollectionName // Specify the custom collection name here
+  collection: customCollectionName,
 });
 
-const SessionDataNow = mongoose.model("SessionDataNow",SessionDataScheme1)
+// Create a separate connection for this schema
+mongoose.set('useCreateIndex',true)
+mongoose.set("strictQuery", true);
+const customDbConnection = mongoose.createConnection("mongodb+srv://mohak:xpPb0L0OFzRt3CJu@cluster0.rcgseuy.mongodb.net/Playground?retryWrites=true&w=majority", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-module.exports = SessionDataNow
+// Create a model using the schema and the custom connection
+const SessionDataNow = customDbConnection.model("SessionDataNow", SessionDataScheme1);
+
+module.exports = SessionDataNow;
