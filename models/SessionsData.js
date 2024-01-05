@@ -42,6 +42,6 @@ const customDbConnection = mongoose.createConnection("mongodb+srv://mohak:xpPb0L
 });
 
 // Create a model using the schema and the custom connection
-const SessionData = customDbConnection.model("SessionDataNow", SessionDataScheme1);
+const SessionData = customDbConnection.model("SessionData", SessionDataScheme1);
 
 module.exports = SessionData;
