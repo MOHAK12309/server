@@ -123,3 +123,29 @@ exports.getRide=catchAsync(async(req,res)=>{
 
   })
 })
+exports.updateRideAfterPurchase = catchAsync(async (req, res) => {
+  const RideId = req.params.RideID;
+
+  // Update the ride status to "busy"
+  const updatedRide = await Ride.findOneAndUpdate(
+    { RideID: RideId },
+    { $set: { Status: "busy" } },
+    { new: true }
+  );
+
+  // Set a timeout to update the ride status to "Avail" after 5 seconds
+  setTimeout(async () => {
+    const rideAfterTimeout = await Ride.findOneAndUpdate(
+      { RideID: RideId, Status: "busy" }, // Ensure status is still "busy" to avoid race conditions
+      { $set: { Status: "Avail" } },
+      { new: true }
+    );
+
+    console.log("Ride status set back to 'Avail' after timeout:", rideAfterTimeout);
+  }, 50000);
+  
+  res.status(201).json({
+    status: 'true',
+    updatedRide
+  });
+});
