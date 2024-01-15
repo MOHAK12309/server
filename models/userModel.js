@@ -13,6 +13,10 @@ const user_schema = new mongoose.Schema({
         type: String,
 
     },
+    Description:{
+        type:String
+
+    },
     lastname: {
         type: String
     },
