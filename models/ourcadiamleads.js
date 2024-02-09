@@ -12,7 +12,7 @@ const SessionDataScheme1 = new mongoose.Schema({
   },
 
   EmailOfLead: {
-    type: Number,
+    type: String,
   },
 
   ContactOfaLead: {
@@ -40,4 +40,4 @@ const Leads = customDbConnection.model(
   SessionDataScheme1
 );
 
-module.exports =Leads;
+module.exports = Leads;
