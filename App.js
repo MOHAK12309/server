@@ -12,6 +12,7 @@ const compression = require('compression');
 const auth=require("./routes/auth")
 const auth2=require("./routes/testRoute")
 const book=require("./routes/booking")
+const lead=require("./routes/leads")
 // const verify=require("./routes/verify")
 // const admin=require("./routes/adminRoute")
 // const upcoming=require("./routes/upcomingRoutes")
@@ -89,6 +90,7 @@ app.use('/api/v1/test', auth2);
 app.use('/api/v1/session',Sessdata)
 app.use('/api/v1/ride',ride)
 app.use('/api/v1/booking',book)
+app.use('/api/v1/ourcadium',lead)
 // app.use('/api/v1/verify', verify);
 // app.use('/api/v1/admin', admin);
 // app.use("/auth", googleOathRouter)
