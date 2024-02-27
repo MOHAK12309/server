@@ -19,7 +19,7 @@ const admin = require("firebase-admin");
 
 exports.CreateContactData = async (req, res) => {
   try {
-    const session = await BoardingLead.create({
+    const session = await Contact.create({
         NameOfContact: req.body.NameOfContact,
         MessageOfContact: req.body.  MessageOfContact,
         EmailOfContact: req.body.EmailOfContact,
