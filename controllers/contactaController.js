@@ -21,7 +21,7 @@ exports.CreateContactData = async (req, res) => {
   try {
     const session = await BoardingLead.create({
         NameOfContact: req.body.NameOfContact,
-        SubjectOfContact: req.body.SubjectOfContact,
+        MessageOfContact: req.body.  MessageOfContact,
         EmailOfContact: req.body.EmailOfContact,
         PhoneOfContact: req.body.PhoneOfContact,
         SubjectOfContact:req.body.SubjectOfContact
