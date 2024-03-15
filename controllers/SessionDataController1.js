@@ -37,3 +37,17 @@ exports.CreateData = async (req, res) => {
     console.log(error);
   }
 };
+exports.GetData = async (req, res) => {
+  try {
+    const session = await SessionDataController.find();
+    res.status(200).json({
+      status: "Success",
+      Data: {
+        session,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
