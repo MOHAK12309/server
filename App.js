@@ -23,9 +23,9 @@ const session=require("express-session")
 // const contact=require("./routes/contactusroute")
 // const linkedinOathRouter = require('./routes/linkedln-outh');
 // const  googleOathRouter  = require('./routes/googleRouter');
-
 const Sessdata=require("./routes/SessionDataRoute1")
 const ride=require("./routes/rideRoute")
+const Admin=require("./routes/admin_route")
 const cors = require('cors');
 
 const app = express();
@@ -95,6 +95,7 @@ app.use('/api/v1/booking',book)
 app.use('/api/v1/ourcadium',lead)
 app.use('/api/v1/onBoarding',boardingPass)
 app.use('/api/v1/contact',contact)
+app.use('/api/v1/admin',Admin)
 // app.use('/api/v1/verify', verify);
 // app.use('/api/v1/admin', admin);
 // app.use("/auth", googleOathRouter)
