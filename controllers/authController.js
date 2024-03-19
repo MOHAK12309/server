@@ -45,48 +45,53 @@ exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
 exports.coinFunction = catchAsync(async (req, res) => {
   const userId = req.params.id;
   const amount = req.body.amount;
+  const bookingInfo = {
+      timeOfBooking: new Date().toISOString(), // Update time of booking with current time
+      RideName: req.body.RideName // Update RideName based on request body
+  };
 
   try {
-    const user = await User.findById(userId);
+      const user = await User.findById(userId);
 
-    if (user && user.yourCoin >= amount) {
-      const updatedCoins = user.yourCoin - amount;
+      if (user && user.yourCoin >= amount) {
+          const updatedCoins = user.yourCoin - amount;
 
-      // Update the user's yourCoin field
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: userId },
-        { $set: { yourCoin: updatedCoins, testBuy: true } },
-        { new: true }
-      );
+          // Update the user's yourCoin field
+          const updatedUser = await User.findOneAndUpdate(
+              { _id: userId },
+              { 
+                  $set: { yourCoin: updatedCoins, testBuy: true },
+                  $push: { currentAndPrevious: bookingInfo }
+              },
+              { new: true }
+          );
 
-      console.log("Updated user:", updatedUser);
+          console.log("Updated user:", updatedUser);
 
-      // Return success response or perform additional actions
-      res.status(200).json({
-        status: true,
-        message: "Coins subtracted successfully. Testbuy set to true.",
-        updatedUser: updatedUser,
-      });
+          // Return success response or perform additional actions
+          res.status(200).json({
+              status: true,
+              message: "Coins subtracted successfully. Testbuy set to true.",
+              updatedUser: updatedUser,
+          });
 
-      // Schedule a timer to set testbuy back to false after 5 seconds
-   // 5000 milliseconds = 5 seconds
-  
-    } else {
-      console.log("User not found or coins are not sufficient.");
-      res.status(404).json({
-        status: false,
-        message: "User not found or coins are not sufficient.",
-      });
-    }
+          // Schedule a timer to set testbuy back to false after 5 seconds
+          // 5000 milliseconds = 5 seconds
+      } else {
+          console.log("User not found or coins are not sufficient.");
+          res.status(404).json({
+              status: false,
+              message: "User not found or coins are not sufficient.",
+          });
+      }
   } catch (error) {
-    console.error("Error in coinFunction:", error);
-    res.status(500).json({
-      status: false,
-      message: "Internal Server Error",
-    });
+      console.error("Error in coinFunction:", error);
+      res.status(500).json({
+          status: false,
+          message: "Internal Server Error",
+      });
   }
 });
-
 
 const singnup = (id) => {
   return jwt.sign({ id }, "this-is-my-super-longer-secret", {

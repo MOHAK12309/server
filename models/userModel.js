@@ -13,6 +13,19 @@ const user_schema = new mongoose.Schema({
         type: String,
 
     },
+   
+    currentAndPrevious:{
+        type:[{
+            timeOfBooking:{
+                type:String
+            },
+            RideName:{
+                type:String
+            }
+
+
+    }]
+    },
     Description:{
         type:String
 
