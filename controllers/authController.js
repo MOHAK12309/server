@@ -45,6 +45,7 @@ exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
 exports.coinFunction = catchAsync(async (req, res) => {
   const userId = req.params.id;
   const amount = req.body.amount;
+  const Ride=req.body.RideName
   const bookingInfo = {
       timeOfBooking: new Date().toISOString(), // Update time of booking with current time
       RideName: req.body.RideName // Update RideName based on request body
@@ -75,7 +76,7 @@ exports.coinFunction = catchAsync(async (req, res) => {
       const updatedUser = await User.findOneAndUpdate(
           { _id: userId },
           { 
-              $set: { yourCoin: updatedCoins, testBuy: true,current:RideName },
+              $set: { yourCoin: updatedCoins, testBuy: true,current:Ride },
               $push: { currentAndPrevious: bookingInfo }
           },
           { new: true }
