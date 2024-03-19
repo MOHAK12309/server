@@ -96,7 +96,7 @@ exports.coinFunction = catchAsync(async (req, res) => {
           // Reset testBuy status to false after 5 seconds
           await User.findByIdAndUpdate(userId, { $set: { status: "Avail",current:"" } });
           console.log("Testbuy status reset to false after 5 seconds.");
-      }, 5000);
+      }, 5*60*1000);
       
   } catch (error) {
       console.error("Error in coinFunction:", error);
