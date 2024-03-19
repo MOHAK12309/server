@@ -13,6 +13,9 @@ const user_schema = new mongoose.Schema({
         type: String,
 
     },
+    current:{
+        type:String
+    },
    
     currentAndPrevious:{
         type:[{

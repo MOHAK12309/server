@@ -75,7 +75,7 @@ exports.coinFunction = catchAsync(async (req, res) => {
       const updatedUser = await User.findOneAndUpdate(
           { _id: userId },
           { 
-              $set: { yourCoin: updatedCoins, testBuy: true },
+              $set: { yourCoin: updatedCoins, testBuy: true,current:RideName },
               $push: { currentAndPrevious: bookingInfo }
           },
           { new: true }
@@ -93,7 +93,7 @@ exports.coinFunction = catchAsync(async (req, res) => {
       // Schedule a timer to set testBuy back to false after 5 seconds (5000 milliseconds)
       setTimeout(async () => {
           // Reset testBuy status to false after 5 seconds
-          await User.findByIdAndUpdate(userId, { $set: { status: "Avail" } });
+          await User.findByIdAndUpdate(userId, { $set: { status: "Avail",current:"" } });
           console.log("Testbuy status reset to false after 5 seconds.");
       }, 5000);
       
