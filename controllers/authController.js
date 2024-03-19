@@ -93,7 +93,7 @@ exports.coinFunction = catchAsync(async (req, res) => {
       // Schedule a timer to set testBuy back to false after 5 seconds (5000 milliseconds)
       setTimeout(async () => {
           // Reset testBuy status to false after 5 seconds
-          await User.findByIdAndUpdate(userId, { $set: { testBuy: "Avail" } });
+          await User.findByIdAndUpdate(userId, { $set: { status: "Avail" } });
           console.log("Testbuy status reset to false after 5 seconds.");
       }, 5000);
       
