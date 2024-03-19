@@ -53,38 +53,50 @@ exports.coinFunction = catchAsync(async (req, res) => {
   try {
       const user = await User.findById(userId);
 
-      if (user && user.yourCoin >= amount) {
-          const updatedCoins = user.yourCoin - amount;
-
-          // Update the user's yourCoin field
-          const updatedUser = await User.findOneAndUpdate(
-              { _id: userId },
-              { 
-                  $set: { yourCoin: updatedCoins, testBuy: true },
-                  $push: { currentAndPrevious: bookingInfo }
-              },
-              { new: true }
-          );
-
-          console.log("Updated user:", updatedUser);
-
-          // Return success response or perform additional actions
-          res.status(200).json({
-              status: true,
-              message: "Coins subtracted successfully. Testbuy set to true.",
-              updatedUser: updatedUser,
-              data:{user}
-          });
-
-          // Schedule a timer to set testbuy back to false after 5 seconds
-          // 5000 milliseconds = 5 seconds
-      } else {
-          console.log("User not found or coins are not sufficient.");
-          res.status(404).json({
+      if (!user) {
+          console.log("User not found.");
+          return res.status(404).json({
               status: false,
-              message: "User not found or coins are not sufficient.",
+              message: "User not found.",
           });
       }
+
+      if (user.yourCoin < amount) {
+          console.log("Insufficient coins.");
+          return res.status(400).json({
+              status: false,
+              message: "Insufficient coins.",
+          });
+      }
+
+      const updatedCoins = user.yourCoin - amount;
+
+      // Update the user's yourCoin field and add bookingInfo to currentAndPrevious array
+      const updatedUser = await User.findOneAndUpdate(
+          { _id: userId },
+          { 
+              $set: { yourCoin: updatedCoins, testBuy: true },
+              $push: { currentAndPrevious: bookingInfo }
+          },
+          { new: true }
+      );
+
+      console.log("Updated user:", updatedUser);
+
+      // Return success response or perform additional actions
+      res.status(200).json({
+          status: true,
+          message: "Coins subtracted successfully. Testbuy set to true.",
+          updatedUser: updatedUser,
+      });
+
+      // Schedule a timer to set testBuy back to false after 5 seconds (5000 milliseconds)
+      setTimeout(async () => {
+          // Reset testBuy status to false after 5 seconds
+          await User.findByIdAndUpdate(userId, { $set: { testBuy: false } });
+          console.log("Testbuy status reset to false after 5 seconds.");
+      }, 5000);
+      
   } catch (error) {
       console.error("Error in coinFunction:", error);
       res.status(500).json({
@@ -93,6 +105,7 @@ exports.coinFunction = catchAsync(async (req, res) => {
       });
   }
 });
+
 
 const singnup = (id) => {
   return jwt.sign({ id }, "this-is-my-super-longer-secret", {
