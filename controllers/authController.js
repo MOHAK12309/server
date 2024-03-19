@@ -73,6 +73,7 @@ exports.coinFunction = catchAsync(async (req, res) => {
               status: true,
               message: "Coins subtracted successfully. Testbuy set to true.",
               updatedUser: updatedUser,
+              data:{user}
           });
 
           // Schedule a timer to set testbuy back to false after 5 seconds
